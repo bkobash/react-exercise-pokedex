@@ -1,11 +1,14 @@
-# react-exercise-weather
+# react-exercise-pokedex
 
-Some more tinkering with ReactJS.
+Yet more tinkering with ReactJS.
 
 ### Run
-* npm start (in terminal)
-* http-server -p 8659 (in separate terminal window)
-* http://127.0.0.1:8659/ (in web browser)
+* npm start
+* In separate terminal:
+  * cd simple-express-server
+  * nodemon
+* Drag public/index.html into your web browser
 
 ### Issues
-* Rate-limiting with openweathermap. Hence, the Load button for the non-San Francisco cards.
+* PokeAPI is really slow, presumably due to the size of the data coming back.
+* PokeAPI limits 300 requests to one IP address per day. So, I ended up creating an express server to cache the API data locally, which speeds things up after the initial load.
