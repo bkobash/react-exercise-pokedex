@@ -6,7 +6,7 @@ var PokemonTypeLozenge = require("./PokemonTypeLozenge.jsx");
 
 var PokemonListItem = React.createClass({
 
-  mixins: [ Reflux.listenTo(PokemonStore, "onChangePokemon") ],
+  mixins: [ Reflux.listenTo(PokemonStore, "handlePokemonStoreChange") ],
 
   propTypes: {
     pokemonId: React.PropTypes.number,
@@ -16,7 +16,7 @@ var PokemonListItem = React.createClass({
   getDefaultProps: function() {
     return {
       pokemonId: 0,
-      name: "asdf"
+      name: "-"
     }
   },
 
@@ -25,6 +25,10 @@ var PokemonListItem = React.createClass({
       hover: false,
       pokemonSelected: {}
     }
+  },
+
+  handlePokemonStoreChange: function(e, pokemonList, pokemonSelected) {
+    this.setState({ pokemonSelected: pokemonSelected });
   },
 
   onClick: function() {
@@ -39,10 +43,6 @@ var PokemonListItem = React.createClass({
     this.setState({ hover: false });
   },
 
-  onChangePokemon: function(event, pokemonList, pokemonSelected) {
-    this.setState({ pokemonSelected: pokemonSelected });
-  },
-
   render: function() {
 
     var gridItemStyle = {
@@ -55,7 +55,7 @@ var PokemonListItem = React.createClass({
       marginBottom: 32,
       textAlign: "left",
       paddingTop: 120,
-      borderBottom: "solid 1px #999999",
+      borderBottom: "solid 1px #ffffff",
       color: "#808080",
       cursor: "pointer"
     };
@@ -67,10 +67,10 @@ var PokemonListItem = React.createClass({
       height: 120,
       filter: "grayscale(100%)",
       WebkitFilter: "grayscale(100%)",
-      transition: "filter 0.2s, -webkit-filter 0.2s"
+      transition: "filter 0.4s, -webkit-filter 0.4s"
     }
     var nameStyle = {
-      fontSize: 12,
+      fontSize: 13,
       fontWeight: "bold",
       textTransform: "uppercase",
       marginBottom: 4
@@ -78,23 +78,30 @@ var PokemonListItem = React.createClass({
     var idStyle = {
       color: "#999999"
     };
-    var coloredLozenges = false;
 
-    if (this.state.hover || (this.props.pokemonId == this.state.pokemonSelected.id)) {
+    var coloredLozenges = false;
+    var isSelected = this.props.pokemonId === this.state.pokemonSelected.id;
+    var image = "http://pokeapi.co/media/img/" + this.props.pokemonId + ".png";
+
+    // This list item has been moused over or selected
+    if (this.state.hover || isSelected) {
       gridItemStyle.color = "#000000";
       pokemonListImageStyle.filter = "grayscale(0%)";
       pokemonListImageStyle.WebkitFilter = "grayscale(0%)";
       coloredLozenges = true;
     }
 
-    if (this.props.pokemonId == this.state.pokemonSelected.id) {
+    // Add a bar at the bottom if the item has been selected
+    if (isSelected) {
       gridItemStyle.borderBottom = "solid 2px #000000";
     }
 
     return (
       <div onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave} onClick={this.onClick} style={gridItemStyle}>
-        <img src={"http://pokeapi.co/media/img/" + this.props.pokemonId + ".png"} style={pokemonListImageStyle} />
-        <div style={nameStyle}><span style={idStyle}>#{this.props.pokemonId}</span> {this.props.name}</div>
+        <img src={image} style={pokemonListImageStyle} />
+        <div style={nameStyle}>
+          <span style={idStyle}>#{this.props.pokemonId}</span> {this.props.name}
+        </div>
         <PokemonTypeLozenge types={this.props.types} isColored={coloredLozenges}/>
       </div>
     );

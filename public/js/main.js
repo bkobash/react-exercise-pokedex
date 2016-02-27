@@ -22285,16 +22285,15 @@ process.umask = function() { return 0; };
 },{}],180:[function(require,module,exports){
 var React = require('react');
 var Reflux = require("reflux");
-var _ = require('underscore');
-var Actions = require("../reflux/actions.jsx");
 var PokemonStore = require("../reflux/pokemon-store.jsx");
-var PokemonTypeLozenge = require("./PokemonTypeLozenge.jsx");
-var PokemonMoveLozenge = require("./PokemonMoveLozenge.jsx");
+var PokemonDetailTableRow = require("./PokemonDetailTableRow.jsx");
+// var PokemonTypeLozenge = require("./PokemonTypeLozenge.jsx");
+// var PokemonMoveLozenge = require("./PokemonMoveLozenge.jsx");
 
 var PokemonDetail = React.createClass({
-  displayName: 'PokemonDetail',
+  displayName: "PokemonDetail",
 
-  mixins: [Reflux.listenTo(PokemonStore, "onChangePokemon")],
+  mixins: [Reflux.listenTo(PokemonStore, "handlePokemonStoreChange")],
 
   getInitialState: function () {
     return {
@@ -22302,142 +22301,70 @@ var PokemonDetail = React.createClass({
     };
   },
 
-  onChangePokemon: function (event, pokemonList, pokemonSelected) {
-    // ingredients: data we got back from the store
+  handlePokemonStoreChange: function (e, pokemonList, pokemonSelected) {
     this.setState({ pokemonSelected: pokemonSelected });
-    //console.log(pokemonDetail);
   },
 
   render: function () {
 
-    var detailColumnStyle = {
-      padding: 24
-    };
-    var pokemonDetailImageStyle = {
-      margin: "0 auto 0 auto",
-      display: "block",
-      width: 280,
-      height: 280
-    };
-    var nameStyle = {
-      textTransform: "uppercase",
-      fontWeight: "bold",
-      textAlign: "center"
-    };
-    var detailsTableStyle = {
-      width: 240,
-      margin: "24px auto"
-    };
-    var detailsTableCellStyle = {
-      padding: "4px 0",
-      verticalAlign: "top"
-    };
-    var detailsTableDataStyle = {
-      padding: "4px 0",
-      verticalAlign: "top",
-      textAlign: "right",
-      fontWeight: "bold"
-    };
-
     if (!this.state.pokemonSelected.name) {
 
       // assume there's no pokemon selected, so just return an empty div
-      return React.createElement('div', null);
+      return React.createElement("div", null);
     } else {
 
-      var name = this.state.pokemonSelected.name || "",
-          pokemonId = this.state.pokemonSelected.id || "",
-          height = this.state.pokemonSelected.height || "",
-          weight = this.state.pokemonSelected.weight || "",
-          species = this.state.pokemonSelected.species && this.state.pokemonSelected.species.name ? this.state.pokemonSelected.species.name : "",
-          types = this.state.pokemonSelected.types || [],
-          moves = this.state.pokemonSelected.moves ? this.state.pokemonSelected.moves.slice(0, 3) : [];
+      var detailColumnStyle = {
+        padding: 24
+      };
+      var pokemonDetailImageStyle = {
+        margin: "0 auto 0 auto",
+        display: "block",
+        width: 280,
+        height: 280
+      };
+      var nameStyle = {
+        textTransform: "uppercase",
+        fontWeight: "bold",
+        textAlign: "center",
+        fontSize: 18
+      };
+      var detailsTableStyle = {
+        width: 240,
+        margin: "24px auto"
+      };
+      var detailsTableCellStyle = {
+        padding: "4px 0",
+        verticalAlign: "top"
+      };
+      var detailsTableDataStyle = {
+        padding: "4px 0",
+        verticalAlign: "top",
+        textAlign: "right",
+        fontWeight: "bold"
+      };
+
+      var image = "http://pokeapi.co/media/img/" + this.state.pokemonSelected.id + ".png";
 
       return React.createElement(
-        'div',
+        "div",
         { style: detailColumnStyle },
-        React.createElement('img', { src: "http://pokeapi.co/media/img/" + this.state.pokemonSelected.id + ".png", style: pokemonDetailImageStyle }),
+        React.createElement("img", { src: image, style: pokemonDetailImageStyle }),
         React.createElement(
-          'div',
+          "div",
           { style: nameStyle },
           this.state.pokemonSelected.name
         ),
         React.createElement(
-          'table',
+          "table",
           { style: detailsTableStyle },
           React.createElement(
-            'tbody',
+            "tbody",
             null,
-            React.createElement(
-              'tr',
-              null,
-              React.createElement(
-                'td',
-                { style: detailsTableCellStyle },
-                'ID'
-              ),
-              React.createElement(
-                'td',
-                { style: detailsTableDataStyle },
-                pokemonId
-              )
-            ),
-            React.createElement(
-              'tr',
-              null,
-              React.createElement(
-                'td',
-                { style: detailsTableCellStyle },
-                'Height'
-              ),
-              React.createElement(
-                'td',
-                { style: detailsTableDataStyle },
-                height
-              )
-            ),
-            React.createElement(
-              'tr',
-              null,
-              React.createElement(
-                'td',
-                { style: detailsTableCellStyle },
-                'Weight'
-              ),
-              React.createElement(
-                'td',
-                { style: detailsTableDataStyle },
-                weight
-              )
-            ),
-            React.createElement(
-              'tr',
-              null,
-              React.createElement(
-                'td',
-                { style: detailsTableCellStyle },
-                'Type'
-              ),
-              React.createElement(
-                'td',
-                { style: detailsTableDataStyle },
-                React.createElement(PokemonTypeLozenge, { types: types, isColored: true, isDetail: true })
-              )
-            ),
-            React.createElement(
-              'tr',
-              null,
-              React.createElement(
-                'td',
-                { style: detailsTableCellStyle },
-                'Moves'
-              ),
-              React.createElement(
-                'td',
-                { style: detailsTableDataStyle },
-                React.createElement(PokemonMoveLozenge, { moves: moves })
-              )
-            )
+            React.createElement(PokemonDetailTableRow, { label: "ID", dataValue: this.state.pokemonSelected.id + "" }),
+            React.createElement(PokemonDetailTableRow, { label: "Height", dataValue: this.state.pokemonSelected.height + "" }),
+            React.createElement(PokemonDetailTableRow, { label: "Weight", dataValue: this.state.pokemonSelected.weight + "" }),
+            React.createElement(PokemonDetailTableRow, { label: "Type", dataList: this.state.pokemonSelected.types }),
+            React.createElement(PokemonDetailTableRow, { label: "Moves", dataList: this.state.pokemonSelected.moves })
           )
         )
       );
@@ -22448,7 +22375,72 @@ var PokemonDetail = React.createClass({
 
 module.exports = PokemonDetail;
 
-},{"../reflux/actions.jsx":186,"../reflux/pokemon-store.jsx":187,"./PokemonMoveLozenge.jsx":183,"./PokemonTypeLozenge.jsx":184,"react":157,"reflux":174,"underscore":177}],181:[function(require,module,exports){
+},{"../reflux/pokemon-store.jsx":188,"./PokemonDetailTableRow.jsx":181,"react":157,"reflux":174}],181:[function(require,module,exports){
+var React = require('react');
+var PokemonTypeLozenge = require("./PokemonTypeLozenge.jsx");
+var PokemonMoveLozenge = require("./PokemonMoveLozenge.jsx");
+
+var PokemonDetailTableRow = React.createClass({
+  displayName: "PokemonDetailTableRow",
+
+  propTypes: {
+    label: React.PropTypes.string,
+    dataValue: React.PropTypes.string,
+    dataList: React.PropTypes.array
+  },
+
+  getDefaultProps: function () {
+    return {
+      label: "",
+      dataValue: null,
+      dataList: []
+    };
+  },
+
+  render: function () {
+
+    var detailsTableCellStyle = {
+      padding: "4px 0",
+      verticalAlign: "top",
+      fontSize: 14
+    };
+    var detailsTableDataStyle = {
+      padding: "4px 0",
+      verticalAlign: "top",
+      textAlign: "right",
+      fontWeight: "bold"
+    };
+
+    var dataValue;
+    if (this.props.label == "Type") {
+      dataValue = React.createElement(PokemonTypeLozenge, { types: this.props.dataList.slice(0, 3), isColored: true, isDetail: true });
+    } else if (this.props.label == "Moves") {
+      dataValue = React.createElement(PokemonMoveLozenge, { moves: this.props.dataList.slice(0, 3) });
+    } else {
+      dataValue = this.props.dataValue;
+    }
+
+    return React.createElement(
+      "tr",
+      null,
+      React.createElement(
+        "td",
+        { style: detailsTableCellStyle },
+        this.props.label
+      ),
+      React.createElement(
+        "td",
+        { style: detailsTableDataStyle },
+        dataValue
+      )
+    );
+  }
+
+});
+
+module.exports = PokemonDetailTableRow;
+
+},{"./PokemonMoveLozenge.jsx":184,"./PokemonTypeLozenge.jsx":185,"react":157}],182:[function(require,module,exports){
 var React = require('react');
 var Reflux = require("reflux");
 var _ = require('underscore');
@@ -22459,7 +22451,7 @@ var PokemonListItem = require("./PokemonListItem.jsx");
 var PokemonList = React.createClass({
   displayName: 'PokemonList',
 
-  mixins: [Reflux.listenTo(PokemonStore, "onChangePokemon")],
+  mixins: [Reflux.listenTo(PokemonStore, "handlePokemonStoreChange")],
 
   getInitialState: function () {
     return {
@@ -22469,15 +22461,14 @@ var PokemonList = React.createClass({
     };
   },
 
-  pokemonList: [], // local pokemon list to filter, etc.
+  pokemonList: [], // local pokemon list to filter, sort
 
   componentWillMount: function () {
-    Actions.getPokemonList();
+    Actions.getPokemonList(28); // get the first 30 pokemon
   },
 
-  onChangePokemon: function (event, pokemonList, pokemonSelected) {
+  handlePokemonStoreChange: function (e, pokemonList, pokemonSelected) {
     this.setState({ pokemonList: pokemonList });
-    //console.log(pokemonSelected);
   },
 
   onSortPokemon: function (e) {
@@ -22513,7 +22504,7 @@ var PokemonList = React.createClass({
         break;
     }
 
-    // filter the pokemon list down
+    // filter the pokemon list down, based on the search query
     this.pokemonList = _.filter(this.pokemonList, (function (item) {
       return item.name.substr(0, this.state.searchValue.length) == this.state.searchValue;
     }).bind(this));
@@ -22622,7 +22613,7 @@ var PokemonList = React.createClass({
 
 module.exports = PokemonList;
 
-},{"../reflux/actions.jsx":186,"../reflux/pokemon-store.jsx":187,"./PokemonListItem.jsx":182,"react":157,"reflux":174,"underscore":177}],182:[function(require,module,exports){
+},{"../reflux/actions.jsx":187,"../reflux/pokemon-store.jsx":188,"./PokemonListItem.jsx":183,"react":157,"reflux":174,"underscore":177}],183:[function(require,module,exports){
 var React = require("react");
 var Reflux = require("reflux");
 var Actions = require("../reflux/actions.jsx");
@@ -22632,7 +22623,7 @@ var PokemonTypeLozenge = require("./PokemonTypeLozenge.jsx");
 var PokemonListItem = React.createClass({
   displayName: "PokemonListItem",
 
-  mixins: [Reflux.listenTo(PokemonStore, "onChangePokemon")],
+  mixins: [Reflux.listenTo(PokemonStore, "handlePokemonStoreChange")],
 
   propTypes: {
     pokemonId: React.PropTypes.number,
@@ -22642,7 +22633,7 @@ var PokemonListItem = React.createClass({
   getDefaultProps: function () {
     return {
       pokemonId: 0,
-      name: "asdf"
+      name: "-"
     };
   },
 
@@ -22651,6 +22642,10 @@ var PokemonListItem = React.createClass({
       hover: false,
       pokemonSelected: {}
     };
+  },
+
+  handlePokemonStoreChange: function (e, pokemonList, pokemonSelected) {
+    this.setState({ pokemonSelected: pokemonSelected });
   },
 
   onClick: function () {
@@ -22665,10 +22660,6 @@ var PokemonListItem = React.createClass({
     this.setState({ hover: false });
   },
 
-  onChangePokemon: function (event, pokemonList, pokemonSelected) {
-    this.setState({ pokemonSelected: pokemonSelected });
-  },
-
   render: function () {
 
     var gridItemStyle = {
@@ -22681,7 +22672,7 @@ var PokemonListItem = React.createClass({
       marginBottom: 32,
       textAlign: "left",
       paddingTop: 120,
-      borderBottom: "solid 1px #999999",
+      borderBottom: "solid 1px #ffffff",
       color: "#808080",
       cursor: "pointer"
     };
@@ -22693,10 +22684,10 @@ var PokemonListItem = React.createClass({
       height: 120,
       filter: "grayscale(100%)",
       WebkitFilter: "grayscale(100%)",
-      transition: "filter 0.2s, -webkit-filter 0.2s"
+      transition: "filter 0.4s, -webkit-filter 0.4s"
     };
     var nameStyle = {
-      fontSize: 12,
+      fontSize: 13,
       fontWeight: "bold",
       textTransform: "uppercase",
       marginBottom: 4
@@ -22704,23 +22695,28 @@ var PokemonListItem = React.createClass({
     var idStyle = {
       color: "#999999"
     };
-    var coloredLozenges = false;
 
-    if (this.state.hover || this.props.pokemonId == this.state.pokemonSelected.id) {
+    var coloredLozenges = false;
+    var isSelected = this.props.pokemonId === this.state.pokemonSelected.id;
+    var image = "http://pokeapi.co/media/img/" + this.props.pokemonId + ".png";
+
+    // This list item has been moused over or selected
+    if (this.state.hover || isSelected) {
       gridItemStyle.color = "#000000";
       pokemonListImageStyle.filter = "grayscale(0%)";
       pokemonListImageStyle.WebkitFilter = "grayscale(0%)";
       coloredLozenges = true;
     }
 
-    if (this.props.pokemonId == this.state.pokemonSelected.id) {
+    // Add a bar at the bottom if the item has been selected
+    if (isSelected) {
       gridItemStyle.borderBottom = "solid 2px #000000";
     }
 
     return React.createElement(
       "div",
       { onMouseEnter: this.onMouseEnter, onMouseLeave: this.onMouseLeave, onClick: this.onClick, style: gridItemStyle },
-      React.createElement("img", { src: "http://pokeapi.co/media/img/" + this.props.pokemonId + ".png", style: pokemonListImageStyle }),
+      React.createElement("img", { src: image, style: pokemonListImageStyle }),
       React.createElement(
         "div",
         { style: nameStyle },
@@ -22741,7 +22737,7 @@ var PokemonListItem = React.createClass({
 
 module.exports = PokemonListItem;
 
-},{"../reflux/actions.jsx":186,"../reflux/pokemon-store.jsx":187,"./PokemonTypeLozenge.jsx":184,"react":157,"reflux":174}],183:[function(require,module,exports){
+},{"../reflux/actions.jsx":187,"../reflux/pokemon-store.jsx":188,"./PokemonTypeLozenge.jsx":185,"react":157,"reflux":174}],184:[function(require,module,exports){
 var React = require("react");
 
 var PokemonMoveLozenge = React.createClass({
@@ -22754,7 +22750,8 @@ var PokemonMoveLozenge = React.createClass({
 
   getDefaultProps: function () {
     return {
-      moves: []
+      moves: [],
+      isColored: false
     };
   },
 
@@ -22791,7 +22788,7 @@ var PokemonMoveLozenge = React.createClass({
 
 module.exports = PokemonMoveLozenge;
 
-},{"react":157}],184:[function(require,module,exports){
+},{"react":157}],185:[function(require,module,exports){
 var React = require("react");
 
 var PokemonTypeLozenge = React.createClass({
@@ -22875,7 +22872,7 @@ var PokemonTypeLozenge = React.createClass({
 
 module.exports = PokemonTypeLozenge;
 
-},{"react":157}],185:[function(require,module,exports){
+},{"react":157}],186:[function(require,module,exports){
 var React = require('react');
 var ReactDOM = require('react-dom');
 var PokemonList = require('./components/PokemonList.jsx');
@@ -22884,14 +22881,14 @@ var PokemonDetail = require('./components/PokemonDetail.jsx');
 ReactDOM.render(React.createElement(PokemonList, null), document.getElementById('pokemon_list'));
 ReactDOM.render(React.createElement(PokemonDetail, null), document.getElementById('pokemon_detail'));
 
-},{"./components/PokemonDetail.jsx":180,"./components/PokemonList.jsx":181,"react":157,"react-dom":1}],186:[function(require,module,exports){
+},{"./components/PokemonDetail.jsx":180,"./components/PokemonList.jsx":182,"react":157,"react-dom":1}],187:[function(require,module,exports){
 var Reflux = require("reflux");
 
 var Actions = Reflux.createActions(["getPokemonList", "selectPokemon"]);
 
 module.exports = Actions;
 
-},{"reflux":174}],187:[function(require,module,exports){
+},{"reflux":174}],188:[function(require,module,exports){
 var HTTP = require("../services/httpservice");
 var Reflux = require("reflux");
 var Actions = require("./actions.jsx");
@@ -22904,36 +22901,36 @@ var PokemonStore = Reflux.createStore({
   pokemonSelected: {},
 
   pokemonAlreadyExists: function (id) {
-    var exists = false;
     for (var i = 0; i < this.pokemonList.length; i++) {
       if (id == this.pokemonList[i].id) {
-        exists = true;
+        return true;
         break;
       }
     }
-    return exists;
+    return false;
   },
 
-  getPokemonList: function () {
-    // use the same name ("getPokemon") that's in Actions
+  getPokemonList: function (pokemonLimit) {
+    // use the same name ("getPokemonList") that's in Actions
     if (!this.pokemonList) {
       this.pokemonList = [];
     }
     HTTP.getLocal().then((function (json) {
-      this.pokemonList = json;
+
+      // first, grab all the pokemon that's already on the express server
+      this.pokemonList = json.slice(0, pokemonLimit);
       this.fireUpdate();
 
-      for (var id = 1; id < 31; id++) {
-        // just grabbing pokemon IDs 1-30
-        if (this.pokemonAlreadyExists(id)) {
-          //console.log("Already exists");
-        } else {
-            HTTP.get(id).then((function (json) {
-              this.pokemonList.push(json); // this.pokemon is a local property of PokemonStore
-              HTTP.postLocal(json);
-              this.fireUpdate();
-            }).bind(this)); // have to add bind() to make sure scope for this.setState() is correct
-          }
+      // then, find any pokemon that's left
+      for (var id = 1; id <= pokemonLimit; id++) {
+        if (!this.pokemonAlreadyExists(id)) {
+          // only call pokeapi if it's not on the express server
+          HTTP.get(id).then((function (json) {
+            this.pokemonList.push(json); // add this pokemon JSON to the PokemonStore, so it can be used immediately
+            HTTP.postLocal(json); // add this pokemon JSON to the express server, so it can be fetched quickly later
+            this.fireUpdate();
+          }).bind(this));
+        }
       }
     }).bind(this));
   },
@@ -22949,8 +22946,6 @@ var PokemonStore = Reflux.createStore({
   },
 
   fireUpdate: function () {
-    // triggered whenever we want to have the data refreshed
-
     // this.trigger() is reserved keyword in Reflux.
     // following arguments are the data we want to pass back to components that listen for updates
     this.trigger("change", this.pokemonList, this.pokemonSelected);
@@ -22960,7 +22955,7 @@ var PokemonStore = Reflux.createStore({
 
 module.exports = PokemonStore;
 
-},{"../services/httpservice":188,"./actions.jsx":186,"reflux":174}],188:[function(require,module,exports){
+},{"../services/httpservice":189,"./actions.jsx":187,"reflux":174}],189:[function(require,module,exports){
 var Fetch = require("whatwg-fetch");
 var baseUrl = "http://pokeapi.co/api/v2/pokemon/";
 var localUrl = "http://localhost:6069";
@@ -22997,4 +22992,4 @@ var service = {
 
 module.exports = service;
 
-},{"whatwg-fetch":179}]},{},[185]);
+},{"whatwg-fetch":179}]},{},[186]);

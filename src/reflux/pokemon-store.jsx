@@ -10,35 +10,36 @@ var PokemonStore = Reflux.createStore({
   pokemonSelected: {},
 
   pokemonAlreadyExists: function(id) {
-    var exists = false;
     for (var i = 0; i < this.pokemonList.length; i++) {
       if (id == this.pokemonList[i].id) {
-        exists = true;
+        return true;
         break;
       }
     }
-    return exists;
+    return false;
   },
 
-  getPokemonList: function() { // use the same name ("getPokemon") that's in Actions
+  getPokemonList: function(pokemonLimit) { // use the same name ("getPokemonList") that's in Actions
     if (!this.pokemonList) {
       this.pokemonList = [];
     }
     HTTP.getLocal()
       .then(function(json) {
-        this.pokemonList = json;
+
+        // first, grab all the pokemon that's already on the express server
+        this.pokemonList = json.slice(0, pokemonLimit);
         this.fireUpdate();
 
-        for (var id = 1; id < 31; id++) { // just grabbing pokemon IDs 1-30
-          if (this.pokemonAlreadyExists(id)) {
-            //console.log("Already exists");
-          } else {
+        // then, find any pokemon that's left
+        for (var id = 1; id <= pokemonLimit; id++) {
+          if (!this.pokemonAlreadyExists(id)) {
+            // only call pokeapi if it's not on the express server
             HTTP.get(id)
               .then(function(json) {
-                this.pokemonList.push(json); // this.pokemon is a local property of PokemonStore
-                HTTP.postLocal(json);
+                this.pokemonList.push(json); // add this pokemon JSON to the PokemonStore, so it can be used immediately
+                HTTP.postLocal(json); // add this pokemon JSON to the express server, so it can be fetched quickly later
                 this.fireUpdate();
-              }.bind(this)); // have to add bind() to make sure scope for this.setState() is correct
+              }.bind(this));
           }
         }
 
@@ -56,8 +57,7 @@ var PokemonStore = Reflux.createStore({
     this.fireUpdate();
   },
 
-  fireUpdate: function() { // triggered whenever we want to have the data refreshed
-
+  fireUpdate: function() {
     // this.trigger() is reserved keyword in Reflux.
     // following arguments are the data we want to pass back to components that listen for updates
     this.trigger("change", this.pokemonList, this.pokemonSelected);

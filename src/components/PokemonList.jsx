@@ -7,7 +7,7 @@ var PokemonListItem = require("./PokemonListItem.jsx");
 
 var PokemonList = React.createClass({
 
-    mixins: [ Reflux.listenTo(PokemonStore, "onChangePokemon") ],
+    mixins: [ Reflux.listenTo(PokemonStore, "handlePokemonStoreChange") ],
 
     getInitialState: function() {
       return {
@@ -17,15 +17,14 @@ var PokemonList = React.createClass({
       }
     },
 
-    pokemonList: [], // local pokemon list to filter, etc.
+    pokemonList: [], // local pokemon list to filter, sort
 
     componentWillMount: function() {
-      Actions.getPokemonList();
+      Actions.getPokemonList(28); // get the first 30 pokemon
     },
 
-    onChangePokemon: function(event, pokemonList, pokemonSelected) {
+    handlePokemonStoreChange: function(e, pokemonList, pokemonSelected) {
       this.setState({ pokemonList: pokemonList });
-      //console.log(pokemonSelected);
     },
 
     onSortPokemon: function(e) {
@@ -61,7 +60,7 @@ var PokemonList = React.createClass({
             break;
         }
 
-        // filter the pokemon list down
+        // filter the pokemon list down, based on the search query
         this.pokemonList = _.filter(this.pokemonList, function(item) {
           return item.name.substr(0, this.state.searchValue.length) == this.state.searchValue;
         }.bind(this));

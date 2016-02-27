@@ -9,7 +9,8 @@ var PokemonMoveLozenge = React.createClass({
 
   getDefaultProps: function() {
     return {
-      moves: []
+      moves: [],
+      isColored: false
     }
   },
 
